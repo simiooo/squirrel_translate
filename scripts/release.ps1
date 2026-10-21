@@ -18,7 +18,7 @@ try {
     $files = @('squirrel_translate.exe','LICENSE','THIRD_PARTY_NOTICES.txt','PRIVACY.md') | ForEach-Object { Join-Path $built $_ }
     Compress-Archive -LiteralPath $files -DestinationPath $zipPath -Force
     $setupName = "squirrel_translate-$Version-windows-$Architecture-setup.exe"
-    Copy-Item -LiteralPath (Join-Path $built "squirrel_translate Setup $Version $Architecture.exe") -Destination (Join-Path $out $setupName)
+    Copy-Item -LiteralPath (Join-Path $built "Squirrel Translate Setup $Version $Architecture.exe") -Destination (Join-Path $out $setupName)
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot 'install.ps1') -Destination (Join-Path $out 'install.ps1')
     $checksums = @($zipName, $setupName, 'install.ps1') | ForEach-Object {
         $hash = (Get-FileHash -LiteralPath (Join-Path $out $_) -Algorithm SHA256).Hash.ToLowerInvariant()

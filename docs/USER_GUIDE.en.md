@@ -1,4 +1,4 @@
-# squirrel_translate · 松鼠翻译
+# Squirrel Translate · 松鼠翻译
 
 [简体中文](USER_GUIDE.md) · [Download releases](https://github.com/simiooo/squirrel_translate/releases) · [Privacy](../PRIVACY.md)
 
@@ -25,7 +25,7 @@ Windows x64 and ARM64 are supported. Choose either installation method below.
 | Intel / AMD 64-bit (x64) | `squirrel_translate-<version>-windows-amd64-setup.exe` | `squirrel_translate-<version>-windows-amd64.zip` |
 | Windows ARM64 | `squirrel_translate-<version>-windows-arm64-setup.exe` | `squirrel_translate-<version>-windows-arm64.zip` |
 
-3. Run `-setup.exe`, then open **squirrel_translate** from the Start menu. For the ZIP, extract all files into the same folder and run `squirrel_translate.exe`.
+3. Run `-setup.exe`, then open **Squirrel Translate** from the Start menu. For the ZIP, extract all files into the same folder and run `squirrel_translate.exe`.
 
 Find your system type under Windows **Settings → System → About**. The **Source code** downloads are not runnable applications. Packages are currently unsigned, so Windows may show an unknown-publisher prompt.
 

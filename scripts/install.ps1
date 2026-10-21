@@ -16,7 +16,7 @@ $repo = 'simiooo/squirrel_translate'
 $destination = [IO.Path]::GetFullPath($InstallDirectory).TrimEnd('\')
 $marker = Join-Path $destination '.squirrel-install.json'
 $exe = Join-Path $destination 'squirrel_translate.exe'
-$shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'squirrel_translate.lnk'
+$shortcut = Join-Path ([Environment]::GetFolderPath('Programs')) 'Squirrel Translate.lnk'
 
 function Assert-OwnedDirectory {
     if (-not (Test-Path -LiteralPath $marker -PathType Leaf)) { throw 'This directory is not managed by the squirrel_translate script installer.' }
@@ -26,7 +26,7 @@ function Assert-OwnedDirectory {
 }
 function Assert-NotRunning {
     $running = @(Get-Process -Name 'squirrel_translate' -ErrorAction SilentlyContinue | Where-Object { $_.Path -eq $exe })
-    if ($running.Count) { throw 'Quit squirrel_translate from the tray before installing or uninstalling.' }
+    if ($running.Count) { throw 'Quit Squirrel Translate from the tray before installing or uninstalling.' }
 }
 if ($destination -eq [IO.Path]::GetPathRoot($destination).TrimEnd('\') -or $destination -eq [IO.Path]::GetFullPath($env:USERPROFILE).TrimEnd('\')) {
     throw 'Choose a dedicated application directory.'
@@ -123,7 +123,7 @@ try {
             $link.TargetPath = $exe
             $link.WorkingDirectory = $destination
             $link.IconLocation = "$exe,0"
-            $link.Description = 'squirrel_translate'
+            $link.Description = 'Squirrel Translate'
             $link.Save()
         }
         $ownsShortcut = -not $NoShortcut
@@ -140,7 +140,7 @@ try {
         }
         throw
     }
-    Write-Output "Installed squirrel_translate $Version ($Architecture) to $destination"
+    Write-Output "Installed Squirrel Translate $Version ($Architecture) to $destination"
 } finally {
     # The only recursive deletion is our freshly allocated, validated temporary directory.
     $tempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd('\') + '\'

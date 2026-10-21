@@ -1,6 +1,6 @@
 # Privacy / 隐私说明
 
-松鼠翻译（squirrel_translate）在本机保存设置和词汇表，默认目录为
+松鼠翻译（Squirrel Translate）在本机保存设置和词汇表，默认目录为
 `%APPDATA%\SquirrelTranslate`。API Key 通过 Windows 凭据存储保存，不写入配置文件。
 
 翻译时，选中的文本、目标语言以及启用时的上下文会发送至用户配置的模型服务。

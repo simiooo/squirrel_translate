@@ -64,7 +64,7 @@ func T(source string) string {
 
 func ProductName() string {
 	if language.Load() {
-		return "squirrel_translate"
+		return "Squirrel Translate"
 	}
 	return "松鼠翻译"
 }

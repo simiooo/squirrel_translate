@@ -23,7 +23,7 @@ func TestLocaleAndFallback(t *testing.T) {
 		}
 	}
 	Set("en", "")
-	if T("翻译") != "Translate" || ProductName() != "squirrel_translate" {
+	if T("翻译") != "Translate" || ProductName() != "Squirrel Translate" {
 		t.Fatal("English catalog not applied")
 	}
 	if got := fmt.Sprintf(T("%d 字符"), 42); got != "42 characters" {

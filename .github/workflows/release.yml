@@ -67,5 +67,5 @@ jobs:
           $assets = @(Get-ChildItem dist/release-*/* -File | Where-Object { $_.Name -ne 'install.ps1' } | ForEach-Object { $_.FullName })
           $assets += (Resolve-Path dist/release-amd64/install.ps1).Path
           $assets += (Resolve-Path dist/winget-manifests.zip).Path
-          gh release create $env:RELEASE_TAG --draft --verify-tag --title "squirrel_translate $env:RELEASE_TAG" --generate-notes @assets
+          gh release create $env:RELEASE_TAG --draft --verify-tag --title "Squirrel Translate $env:RELEASE_TAG" --generate-notes @assets
           if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }

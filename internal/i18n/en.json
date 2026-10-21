@@ -6,7 +6,7 @@
   "密钥保存失败：": "Could not save the API key: ",
   "快捷键不可用：": "Shortcut unavailable: ",
   "快捷键注册失败（可能被占用）：": "Could not register shortcut (it may be in use): ",
-  "打开 Squirrel Translate": "Open squirrel_translate",
+  "打开 Squirrel Translate": "Open Squirrel Translate",
   "托盘初始化失败：": "Could not initialize the tray: ",
   "暂停 / 恢复自动划词": "Pause / resume selection translation",
   "模型设置": "Model settings",
@@ -93,7 +93,7 @@
   "生成译文": "Generated translation",
   "目标语言": "Target language",
   "纠正单词、短语或句子识别": "Correct word, phrase or sentence detection",
-  "翻译 · Squirrel Translate": "Translation · squirrel_translate",
+  "翻译 · Squirrel Translate": "Translation · Squirrel Translate",
   "翻译未完成": "Translation incomplete",
   "翻译类别": "Translation category",
   "词汇表中的释义已更新": "Saved definition updated",
@@ -213,5 +213,5 @@
   "不支持的词汇表版本 %d": "Unsupported vocabulary version %d",
   "释义尚不完整，无法收藏：%w": "The definition is incomplete and cannot be saved: %w",
   "只有单词与短语可以加入词汇表": "Only words and phrases can be added to vocabulary",
-  "松鼠翻译仍在托盘运行": "squirrel_translate is still running in the tray"
+  "松鼠翻译仍在托盘运行": "Squirrel Translate is still running in the tray"
 }

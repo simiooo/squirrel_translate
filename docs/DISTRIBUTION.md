@@ -1,4 +1,4 @@
-# 松鼠翻译 / squirrel_translate 分发方案
+# 松鼠翻译 / Squirrel Translate 分发方案
 
 仓库：https://github.com/simiooo/squirrel_translate 。许可证：MIT。
 本文件中的公开下载地址在首次正式发布之后才可用。当前清单只是待验证的提交材料，

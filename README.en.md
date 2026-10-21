@@ -1,4 +1,4 @@
-# squirrel_translate · 松鼠翻译
+# Squirrel Translate · 松鼠翻译
 
 [简体中文](README.md)
 
@@ -13,10 +13,10 @@ A Windows selection translator with Chinese and English UI, floating translation
 ### Option 2: Install via PowerShell
 
 ```powershell
-irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol = 3072; irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex
 ```
 
-Open **squirrel_translate** from the Start menu. To update, quit from the tray and run the same command again.
+Open **Squirrel Translate** from the Start menu. To update, quit from the tray and run the same command again.
 
 > v0.1.0 is still a draft. Downloads and installation become available after publication.
 

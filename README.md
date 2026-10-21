@@ -1,4 +1,4 @@
-# 松鼠翻译 · squirrel_translate
+# 松鼠翻译 · Squirrel Translate
 
 [English](README.en.md)
 
@@ -13,10 +13,10 @@ Windows 划词翻译工具，支持中英文界面、翻译浮窗和单词收藏
 ### 方式二：通过 PowerShell 安装
 
 ```powershell
-irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex
+[Net.ServicePointManager]::SecurityProtocol = 3072; irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex
 ```
 
-安装后从开始菜单打开 **squirrel_translate**。更新时先从托盘退出，再运行同一条命令。
+安装后从开始菜单打开 **Squirrel Translate**。更新时先从托盘退出，再运行同一条命令。
 
 > v0.1.0 尚为草稿，公开发布后即可下载和安装。
 

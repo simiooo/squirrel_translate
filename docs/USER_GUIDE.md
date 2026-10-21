@@ -1,4 +1,4 @@
-# 松鼠翻译 · squirrel_translate
+# 松鼠翻译 · Squirrel Translate
 
 [English](USER_GUIDE.en.md) · [下载 Releases](https://github.com/simiooo/squirrel_translate/releases) · [隐私说明](../PRIVACY.md)
 
@@ -25,7 +25,7 @@
 | Intel / AMD 64 位（x64） | `squirrel_translate-<版本>-windows-amd64-setup.exe` | `squirrel_translate-<版本>-windows-amd64.zip` |
 | Windows ARM64 | `squirrel_translate-<版本>-windows-arm64-setup.exe` | `squirrel_translate-<版本>-windows-arm64.zip` |
 
-3. 运行 `-setup.exe` 完成安装，然后从开始菜单打开 **squirrel_translate**。使用 ZIP 时，将全部文件解压到同一文件夹，运行 `squirrel_translate.exe`。
+3. 运行 `-setup.exe` 完成安装，然后从开始菜单打开 **Squirrel Translate**。使用 ZIP 时，将全部文件解压到同一文件夹，运行 `squirrel_translate.exe`。
 
 可在 Windows「设置 → 系统 → 系统信息」查看系统类型。Release 中的 **Source code** 是源码，不是可直接运行的应用。当前发布包尚未代码签名，Windows 可能显示发布者未知的提示。
 

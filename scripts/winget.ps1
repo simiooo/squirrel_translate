@@ -42,7 +42,7 @@ PackageVersion: $Version
 PackageLocale: en-US
 Publisher: simiooo
 PublisherUrl: https://github.com/simiooo
-PackageName: squirrel_translate
+PackageName: Squirrel Translate
 PackageUrl: $base
 License: MIT
 LicenseUrl: $base/blob/v$Version/LICENSE

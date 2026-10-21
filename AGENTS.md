@@ -25,3 +25,7 @@ and other details in the linked user guides.
 
 Do not explain the implementation stack or build prerequisites in user-facing
 installation instructions. Focus on where to download and how to install.
+
+Product display names are 松鼠翻译 (Chinese) and Squirrel Translate (English).
+Use squirrel_translate only for technical identifiers, repository names, and
+portable filenames, not user-facing branding.
