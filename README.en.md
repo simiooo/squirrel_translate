@@ -18,6 +18,12 @@ A Windows selection translator with Chinese and English UI, floating translation
 
 Open **Squirrel Translate** from the Start menu. To update, quit from the tray and run the same command again.
 
+## Screenshots
+
+![Main window (demo mode)](docs/images/main-window.jpg)
+
+![Translation window (demo mode)](docs/images/translation-window.jpg)
+
 ## First use
 
 1. Open **Settings → Model** and enter your provider's **API base URL, model ID, and API key** (Chat Completions-compatible).
