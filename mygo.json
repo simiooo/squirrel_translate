@@ -1,0 +1,10 @@
+{
+  "name": "squirrel_translate",
+  "identifier": "io.github.simiooo.squirrel_translate",
+  "version": "0.1.0",
+  "copyright": "Copyright (c) 2026 simiooo. MIT License.",
+  "icon": "design/icon.png",
+  "main": "./cmd/squirrel",
+  "out": "dist",
+  "resources": ["LICENSE", "THIRD_PARTY_NOTICES.txt", "PRIVACY.md"]
+}

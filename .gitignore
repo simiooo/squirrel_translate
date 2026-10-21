@@ -1,0 +1,9 @@
+/dist/
+/artifacts/
+*.exe
+*.log
+/.nuto/
+*.syso
+# Local design experiments unrelated to this product.
+/design/nuto-*
+/design/tools/offline-design.mjs

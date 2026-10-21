@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <clipPath id="clip0">
+      <rect width="256" height="256"/>
+    </clipPath>
+  </defs>
+  <g>
+    <rect width="256" height="256" fill="#FFFFFF"/>
+    <g clip-path="url(#clip0)">
+      <g transform="translate(8, 8)">
+        <path d="M60 0L180 0C213.14 0 240 26.86 240 60L240 180C240 213.14 213.14 240 180 240L60 240C26.86 240 0 213.14 0 180L0 60C0 26.86 26.86 0 60 0" fill="#5146D2"/>
+      </g>
+      <g transform="translate(132, 77.15)">
+        <path d="M0 115.85C52 133.85 93 99.85 90 50.85C88 11.85 57 -9.15 33 3.85C15 13.85 15 42.85 33 54.85C42 61.85 54 57.85 56 48.85C60 70.85 42 82.85 19 72.85L0 115.85Z" fill="#C9C5FF"/>
+      </g>
+      <g transform="translate(58, 66)">
+        <path d="M0 128C1 99 15 83 33 74C20 64 14 51 18 36L14 0L40 21C51 17 62 21 70 30L88 42L75 57L60 62C55 78 68 82 81 88C99 96 106 110 104 128L0 128Z" fill="#FFFFFF"/>
+      </g>
+      <g transform="translate(81, 82)">
+        <path d="M0 0L3 20L15 13L0 0Z" fill="#C9C5FF"/>
+      </g>
+      <g transform="translate(106, 100)">
+        <path d="M0 5C0 7.76 2.24 10 5 10C7.76 10 10 7.76 10 5C10 2.24 7.76 0 5 0C2.24 0 0 2.24 0 5Z" fill="#302674"/>
+      </g>
+      <g transform="translate(65, 185)">
+        <path d="M16 9L0 26L0 0L16 9Z" fill="#FFFFFF"/>
+      </g>
+    </g>
+  </g>
+</svg>

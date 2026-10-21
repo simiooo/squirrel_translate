@@ -1,0 +1,72 @@
+{
+  "main": {
+    "inset_x": 28,
+    "inset_y": 16,
+    "header_y": 6,
+    "header_gap": 8,
+    "section_gap": 24,
+    "row_gap": 8,
+    "inline_gap": 16,
+    "label_width": 104,
+    "nav_y": 8,
+    "nav_gap": 4
+  },
+  "translation": {
+    "inset_x": 16,
+    "header_top": 8,
+    "header_bottom": 8,
+    "header_gap": 4,
+    "panel_y": 6,
+    "loading_y": 6,
+    "loading_gap": 8,
+    "content_y": 16,
+    "footer_y": 8,
+    "action_gap": 4,
+    "grip_top": 2,
+    "body_min_height": 60,
+    "paragraph_gap": 16,
+    "list_item_gap": 4,
+    "body_line_height": 1.6,
+    "loading_line_height": 1.5
+  },
+  "controls": {
+    "unit": 4,
+    "button_x": 8,
+    "button_y": 6,
+    "compact_y": 2,
+    "icon_gap": 8,
+    "icon_button_size": 32,
+    "input_x": 8,
+    "input_y": 6,
+    "toggle_x": 4,
+    "toggle_y": 2,
+    "toggle_size": 14,
+    "toggle_gap": 7,
+    "toggle_min_height": 26,
+    "select_x": 8,
+    "select_y": 6,
+    "select_gap": 8,
+    "select_min_width": 96,
+    "menu_inset": 4,
+    "menu_offset": 4,
+    "menu_item_x": 8,
+    "menu_item_y": 8
+  },
+  "dictionary": {
+    "metadata_gap": 4,
+    "section_gap": 16,
+    "sense_gap": 16,
+    "pair_gap": 4,
+    "detail_gap": 6
+  },
+  "vocabulary": {
+    "entry_y": 14,
+    "detail_gap": 6
+  },
+  "toolbar": {
+    "inset_x": 4,
+    "inset_y": 3,
+    "gap": 4,
+    "grip_x": 2
+  }
+}
