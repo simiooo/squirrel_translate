@@ -68,9 +68,13 @@ jobs:
           $assets = @(Get-ChildItem dist/release-*/* -File | Where-Object { $_.Name -ne 'install.ps1' } | ForEach-Object { $_.FullName })
           $assets += (Resolve-Path dist/release-amd64/install.ps1).Path
           $assets += (Resolve-Path dist/winget-manifests.zip).Path
-          $existing = gh release view $env:RELEASE_TAG --json isDraft 2>$null
-          if ($LASTEXITCODE -eq 0) {
-            if (-not ($existing | ConvertFrom-Json).isDraft) { throw 'Refusing to replace assets of a published release.' }
+          # Listing succeeds even when this tag has no release yet. Redirected
+          # stderr from `gh release view` otherwise terminates PowerShell 5.1.
+          $releases = gh release list --limit 100 --json tagName,isDraft
+          if ($LASTEXITCODE -ne 0) { throw 'Release lookup failed.' }
+          $existing = @(($releases | ConvertFrom-Json) | Where-Object { $_.tagName -eq $env:RELEASE_TAG })
+          if ($existing.Count -gt 0) {
+            if (-not $existing[0].isDraft) { throw 'Refusing to replace assets of a published release.' }
             gh release upload $env:RELEASE_TAG --clobber @assets
             if ($LASTEXITCODE -ne 0) { throw 'Draft asset update failed.' }
           } else {
