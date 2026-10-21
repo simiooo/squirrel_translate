@@ -170,12 +170,17 @@ func TestUIPreviews(t *testing.T) {
 	a.selectedEntry = "bank"
 	vocab := ui.NewTester(a.view, 1040, 704)
 	save("ui-vocabulary", vocab)
+	if r, ok := vocab.Find("朗读单词"); ok {
+		vocab.Move(r.X+r.W/2, r.Y+r.H/2)
+		save("ui-vocabulary-speech-hover", vocab)
+		vocab.Move(-1, -1)
+	}
 	vocab.SetDark(true)
 	save("ui-vocabulary-dark", vocab)
 	a.vocabDetail = true
 	vocab.SetSize(640, 480)
 	save("ui-vocabulary-narrow", vocab)
-	s := &translation{mode: "word", modeChoice: "自动", targetChoice: "自动", target: "简体中文", done: true, dictionary: &dictionary, selection: core.Selection{Text: "bank", Context: "She deposited the money in the bank."}}
+	s := &translation{app: a, mode: "word", modeChoice: "自动", targetChoice: "自动", target: "简体中文", done: true, dictionary: &dictionary, selection: core.Selection{Text: "bank", Context: "She deposited the money in the bank."}}
 	dict := ui.NewTester(s.view, 520, 600)
 	save("ui-dictionary", dict)
 	if r, ok := dict.Find("重新翻译"); ok {

@@ -387,7 +387,7 @@ func (a *application) vocabulary(c *ui.Context) {
 					}
 					e := *selected
 					ui.Scroll(c).Grow(1).MinHeight(0).Gap(metric("Space/16")).Children(func() {
-						ui.Row(c).Gap(metric("Space/8")).AlignItems(ui.Center).Children(func() {
+						ui.Row(c).Padding(metric("Space/4"), 0).Gap(metric("Space/8")).AlignItems(ui.Center).Children(func() {
 							ui.Text(c, e.Word).FontSize(28).Bold().Selectable().Shrink(1).MinWidth(0)
 							a.speechButton(c, e.ID, e.Word, e.SourceLanguage, a.window, func(message string) { a.status = message }, 28)
 						})

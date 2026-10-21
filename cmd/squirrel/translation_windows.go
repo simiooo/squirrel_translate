@@ -355,7 +355,7 @@ func (s *translation) result(c *ui.Context) {
 	d := s.dictionary
 	ui.Column(c).Gap(space.SectionGap).Children(func() {
 		ui.Column(c).Gap(space.MetadataGap).Children(func() {
-			ui.Row(c).Gap(space.MetadataGap).AlignItems(ui.Center).Children(func() {
+			ui.Row(c).Padding(metric("Space/4"), 0).Gap(space.MetadataGap).AlignItems(ui.Center).Children(func() {
 				ui.Text(c, d.Word).FontSize(metric("Type/Word")).Bold().Selectable().Shrink(1).MinWidth(0)
 				if s.app != nil {
 					s.app.speechButton(c, s, d.Word, d.SourceLanguage, s.window, func(message string) { s.notice = message }, metric("Type/Word"))

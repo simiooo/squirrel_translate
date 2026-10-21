@@ -217,10 +217,6 @@ func formSelect(c *ui.Context, value *string, options []string, caption ...strin
 }
 
 func iconButton(c *ui.Context, icon, label string) ui.Element {
-	return offsetIconButton(c, icon, label, 0)
-}
-
-func offsetIconButton(c *ui.Context, icon, label string, offsetY float32) ui.Element {
 	t := c.Theme()
 	size := uiSpacing.Controls.IconButtonSize
 	b := ui.ButtonBase(c).Label(tr(label)).Tooltip(tr(label)).Size(size, size).Radius(t.Radius)
@@ -239,10 +235,7 @@ func offsetIconButton(c *ui.Context, icon, label string, offsetY float32) ui.Ele
 	} else if b.Hovered() {
 		b.Background(t.SurfaceHover)
 	}
-	b.DrawOver(func(p *ui.Painter, r ui.Rect) {
-		r.Y += offsetY
-		drawIcon(p, r, icon, color)
-	})
+	b.DrawOver(func(p *ui.Painter, r ui.Rect) { drawIcon(p, r, icon, color) })
 	return b
 }
 
@@ -274,6 +267,7 @@ func drawIcon(p *ui.Painter, r ui.Rect, name string, color ui.Color) {
 	var path ui.Path
 	switch name {
 	case "speaker":
+		x -= .875 // Center the path's actual bounds, including the curved waves.
 		path.MoveTo(x+2, y+7).LineTo(x+5, y+7).LineTo(x+9, y+3).LineTo(x+9, y+15).LineTo(x+5, y+11).LineTo(x+2, y+11).Close()
 		path.MoveTo(x+12, y+6).CubeTo(x+15, y+7, x+15, y+11, x+12, y+12)
 		path.MoveTo(x+14, y+3).CubeTo(x+19, y+6, x+19, y+12, x+14, y+15)

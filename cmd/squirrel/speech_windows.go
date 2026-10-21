@@ -48,16 +48,13 @@ func (a *application) speechButton(c *ui.Context, owner any, word, language stri
 	}
 	offsetY := float32(0)
 	if len(wordSize) > 0 {
-		// The row centers both boxes. Move only the glyph so its bottom meets
-		// the word's baseline, retaining the button's centered 32-DIP hit area.
+		// Move the whole button to the word baseline, keeping its icon,
+		// hover background and hit area together. Use the same position for stop.
 		metrics := (ui.Font{Family: c.Theme().Font, Size: wordSize[0], Weight: 700}).Metrics()
 		bottom := float32(6) // speaker path ends 6 DIPs below the icon center.
-		if icon == "stop" {
-			bottom = 5
-		}
 		offsetY = (metrics.Ascent-metrics.Descent)/2 - bottom
 	}
-	if !offsetIconButton(c, icon, label, offsetY).Disabled(language == "" || word == "").Clicked() {
+	if !iconButton(c, icon, label).Translate(0, offsetY).Disabled(language == "" || word == "").Clicked() {
 		return
 	}
 	playing := a.speech.owner == owner

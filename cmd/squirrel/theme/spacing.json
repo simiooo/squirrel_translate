@@ -65,7 +65,7 @@
   },
   "toolbar": {
     "inset_x": 4,
-    "inset_y": 3,
+    "inset_y": 6,
     "gap": 4,
     "grip_x": 2
   }
