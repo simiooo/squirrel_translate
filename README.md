@@ -1,222 +1,120 @@
 # 松鼠翻译 · squirrel_translate
 
-Windows 上的全局 LLM 划词翻译原型。Go + mygo 原生界面，不需要 WebView。
+[English](README.en.md) · [下载 Releases](https://github.com/simiooo/squirrel_translate/releases) · [隐私说明](PRIVACY.md)
 
-[English](README.en.md) · [分发与 WinGet 方案](docs/DISTRIBUTION.md) · [隐私说明](PRIVACY.md) · [MIT](LICENSE)
+松鼠翻译是一款开源 Windows 划词翻译工具。选中文字即可翻译，也可以使用快捷键、剪贴板或手动输入；支持独立翻译浮窗、置顶和本地词汇收藏。
 
-界面仅支持简体中文与英文：设置 → 外观 → 界面语言 → 保存。默认跟随系统（中文区域使用简体中文，其他区域使用英文）；独立于翻译目标语言。开发时可通过 `--lang en` 或 `--lang zh-CN` 覆盖。
+- 原生桌面界面，支持浅色、深色主题。
+- 简体中文、英文界面，可跟随系统或手动选择。
+- 接入你自己的 Chat Completions 兼容模型服务，流式显示译文。
+- 单词和短语可收藏、搜索、离线查看与导出。
 
-公开仓库：[simiooo/squirrel_translate](https://github.com/simiooo/squirrel_translate)。发布流程提供 x64/ARM64 安装器、ZIP 和支持 PowerShell 5.1 的安装脚本。WinGet 清单已准备生成流程，尚未上架。
+## 安装
 
-## 运行
+支持 Windows x64 与 ARM64，使用发布包无需安装 Go。以下任选一种安装方式。
 
-构建脚本输出 `dist/windows-amd64/squirrel_translate.exe` 及 NSIS 安装程序。运行新版前请从托盘退出旧进程。
-首次使用进入「设置」，填写兼容接口的基础地址、模型 ID 和 API Key，
-保存后点击「测试连接」。测试连接会向所配置的端点发送一句固定测试文本。
+> v0.1.0 当前为 Release 草稿。维护者公开发布后，Release 下载及下面的 PowerShell 安装命令才可用。
 
-没有 Key 时，开启右上角「演示」即可体验所有主要交互。也可以运行：
+### 方式一：从 Release 页面安装
 
-```powershell
-.\dist\windows-amd64\squirrel_translate.exe --demo
-```
+1. 打开 [Releases 页面](https://github.com/simiooo/squirrel_translate/releases)，选择最新正式版本。
+2. 展开 **Assets**，根据电脑架构下载文件：
 
-演示内容始终标注为本地演示，不是真实翻译或真实模型推理。
+| 电脑类型 | 安装程序（推荐） | 免安装 ZIP |
+| --- | --- | --- |
+| Intel / AMD 64 位（x64） | `squirrel_translate-<版本>-windows-amd64-setup.exe` | `squirrel_translate-<版本>-windows-amd64.zip` |
+| Windows ARM64 | `squirrel_translate-<版本>-windows-arm64-setup.exe` | `squirrel_translate-<版本>-windows-arm64.zip` |
 
-## 已实现
+3. 运行 `-setup.exe` 完成安装，然后从开始菜单打开 **squirrel_translate**。使用 ZIP 时，将全部文件解压到同一文件夹，运行 `squirrel_translate.exe`。
 
-- 鼠标划选、双击选词及键盘选择后显示可拖动工具条；工具条不抢原应用焦点。
-- `Ctrl+Alt+T` 直接翻译当前选文；另有手动输入和主动翻译剪贴板入口。
-- 独立、非模态翻译浮窗；非置顶时离开关闭，关闭取消请求并清理会话。
-- 置顶窗口独立保留，之后的划词不会覆盖它；关闭和退出始终有效。
-- 目标语言自动选择及手动选择；首页与翻译浮窗可选择自动、单词、短语、句子 / 段落模式。
-- 译文流式展示；供应商提供的 `reasoning_content` 作为临时 loading，只显示最新一行。
-- 单词、短语采用精简释义：有上下文时只给最匹配的 1 个义项，无上下文时最多 3 个常见义项。短语按整体含义翻译，不拆词。
-- 每项只保留词性、简短释义和语境标记；不再请求发音、词形、例句、搭配及用法长文。
-- 完整义项逐条显示；结构与字段校验通过后才允许收藏。
-- 复制、停止、标题旁的刷新图标和错误反馈；上下文开关统一在设置中配置。
-- 固定操作区域，正文独立滚动，用户向上阅读后停止跟随输出。
-- 基于显示器工作区的翻转、平移与缩小；支持负坐标、DPI 换算及拖动后的边界收拢。
-- 单词与短语均可收藏、搜索、离线查看、按词元/语言去重更新、移除及 JSON 导出；句子不显示收藏按钮。
-- 收藏使用星星图标，未收藏为空心、已收藏为实心；生成中禁用，悬停说明状态与操作，保存失败可重试。移除浮窗笔记编辑入口，历史备注保留为只读文本。
-- 托盘打开、暂停、剪贴板、词汇表、模型设置与退出；快捷键、应用排除列表和开机启动设置。
-- API Key 保存到 Windows Credential Manager；配置和词汇表保存在本地。
+可在 Windows「设置 → 系统 → 系统信息」查看系统类型。Release 中的 **Source code** 是源码，不是可直接运行的应用。当前发布包尚未代码签名，Windows 可能显示发布者未知的提示。
 
-## 界面
+### 方式二：PowerShell 安装
 
-浮窗保留圆润外形，内部用字号、留白和少量分隔线组织内容，不嵌套卡片。
-所有按钮采用 ghost 样式，默认透明无描边，悬停和键盘焦点保留柔和反馈。
-文字按钮默认保留左右 8、上下 6 的内边距，最小点击高度 32；内容对齐由外层布局补偿，
-不通过去掉按钮内边距压缩点击范围。选择器同样保留内边距。
-普通操作使用中性色，主要操作使用蓝色，成功使用绿色、危险操作使用红色。导航选中态使用明确背景、字重及 3 DIP 状态条，hover / pressed / focus 分开表达。
-输入框的 hover/focus 使用覆盖绘制的下划线：hover 为灰色，focus 为主题色；
-不改变边框宽度、内边距或控件尺寸，文字、光标和同行内容在状态切换时保持原位。
-演示、自动划词、附带上下文和开机启动统一采用 14px 圆角复选框，选中时显示主题色与对勾，
-标签使用中性色。整项可点击，支持 Tab / Space；hover 和键盘焦点保留轻量反馈，切换不改变布局。
-复选框的内距、尺寸、图文间距和最小点击高度由 `controls.toggle_*` 统一调整。
-同类界面遵循同一规则：相关信息紧密成组，文字沿同一条线对齐，
-不添加义项序号或折叠前缀符号，展开状态由字重及无障碍语义表达。
-刷新图标位于「翻译」标题旁，目标语言、置顶和关闭集中在右侧。
-目标语言为无箭头的文字选择器，保留内边距、键盘选择与可滚动菜单。
-浮窗不显示原文、查词入口或可展开的思考面板；译文中的选词查询仍可通过右键菜单使用。
-等待时显示轻量 loading；思考每 100ms 合并更新一次，只显示最新一行，换行时轻微淡入。
-节流在 UI 调度之前完成，正文和词典义项仍即时流式更新。
-模型开始输出正文时立即隐藏思考，停止、完成或出错也会清理；遵循系统减少动态效果的偏好。
-短句默认使用较矮的浮窗，底部操作始终可见。
-主窗口采用自绘无边框顶栏与左侧导航，默认 1040 × 704；翻译工作台并排显示输入与流式结果。词汇表分为列表与详情，设置分为模型 / 翻译 / 快捷键 / 外观。宽度低于 880 时收起导航文字，翻译内容区不足 600 时上下排列，词汇详情提供返回入口。主题支持跟随系统、浅色、深色。
-
-关闭主窗口会隐藏至托盘，退出使用托盘菜单；首次关闭给出一次提示。拖动和双击最大化沿用原生窗口行为，顶部补充 8 DIP 的缩放命中，最大化按显示器工作区布局。
-
-### 间距主题
-
-颜色、字阶、圆角与主要布局尺寸直接嵌入 OpenPencil 共用的 `design/tokens.json`。细分间距定义在 `cmd/squirrel/theme/spacing.json`。主窗口左右留白为 28，
-翻译窗为 16；页面与翻译正文上下留白为 16。词典元信息、
-义项和例句分别分组，只使用一层间距，避免 `gap` 与上下 `padding` 叠加。
-设置行间距为 8，输入和选择器上下内距为 6；词性/释义与例句/译文的
-配对间距由 `dictionary.pair_gap` 控制，默认为 4，义项之间保持独立分组。
-
-| 主题分组 | 调整范围 |
-|---|---|
-| `main` | 主窗口边距、导航、区块、表单行、标签列宽 |
-| `translation` | 浮窗边距、顶部/底部、loading 行、操作间距、正文段落与行高 |
-| `controls` | ghost 按钮内距、图文间距、输入、选择器、下拉选项 |
-| `dictionary` | 单词元信息、区块、义项、释义细节 |
-| `vocabulary` | 词汇表行内距与详情间距 |
-| `toolbar` | 划词工具条内距、控件间距与拖拽区内距 |
-
-距离采用 DIP 逻辑像素；`*_line_height` 为行高倍数。
-默认主题内嵌在程序中。调试时完全退出托盘程序，再加载外部主题，无需重新编译：
+打开 **Windows PowerShell 5.1** 或更新版本，粘贴以下命令。脚本会自动选择架构，下载最新正式版并校验 ZIP 的 SHA-256：
 
 ```powershell
-.\dist\windows-amd64\squirrel_translate.exe --demo --spacing-file .\cmd\squirrel\theme\spacing.json
+$ErrorActionPreference = 'Stop'
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+$installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
+Invoke-WebRequest -UseBasicParsing 'https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1' -OutFile $installer
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer
 ```
 
-外部 JSON 也可只写需要覆盖的字段，其他字段沿用默认值，例如：
+默认安装到 `%LOCALAPPDATA%\Programs\squirrel_translate-portable`，并创建开始菜单快捷方式。无需管理员权限，不修改 PATH；`ExecutionPolicy Bypass` 仅作用于本次启动的 PowerShell 进程。
 
-```json
-{"translation":{"inset_x":8},"dictionary":{"sense_gap":14}}
-```
-
-未知字段、类型错误及超出范围的值会被拒绝。工具条窗口尺寸随内距调整。
-loading 的上边距、图文间距与行高分别由 `translation.loading_y`、`loading_gap`、
-`loading_line_height` 控制；旧的原文/思考展开面板间距已移除。
-可离线渲染调试主题，不打开窗口、不发送模型请求：
+下载脚本后，也可以指定版本或安装位置，例如：
 
 ```powershell
-$env:SQUIRREL_UI_PREVIEW_DIR = "$PWD\artifacts"
-$env:SQUIRREL_SPACING_FILE = "$PWD\cmd\squirrel\theme\spacing.json"
-go test ./cmd/squirrel -run TestUIPreviews -count=1
+$installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Version 0.1.0 -InstallDirectory "$env:LOCALAPPDATA\Programs\MySquirrelTranslate"
 ```
 
-## 模型配置
+仅可安装已公开发布的版本。默认自动识别架构，必要时添加 `-Architecture amd64` 或 `-Architecture arm64`。自定义安装目录后，升级和卸载必须使用相同的 `-InstallDirectory`。
 
-原型实现 **Chat Completions 兼容接口**。基础地址如
-`https://api.deepseek.com`、`https://your-provider.example/v1`，模型 ID 以供应商为准。
-默认地址会补 `/v1`；已有 `/v1` 或 `/api/` 的自定义前缀会保留。
-不要把 API Key 放进 URL，地址中不允许用户名、查询参数或锚点。
+## 首次使用
 
-词典结构化输出支持三种设置：
+1. 打开应用，进入 **设置 → 模型**。
+2. 填写服务商提供的 **基础地址、模型 ID 和 API Key**。需要支持 Chat Completions 兼容接口；基础地址示例为 `https://your-provider.example/v1`，请替换成实际地址。
+3. 点击 **保存**，再点击 **测试连接**。连接测试会发送真实请求，服务商可能计费。应用不附带 API Key。
+4. 在 **设置 → 翻译** 中选择首选语言和第二语言；翻译时也可手动指定目标语言。
 
-| 设置 | 用途 |
-|---|---|
-| `prompt` | 由提示词要求 JSON，兼容性优先，作为初始默认值 |
-| `json_object` | 供应商支持 JSON 对象模式时使用 |
-| `json_schema` | 供应商支持 JSON Schema 时使用；Schema 由 Go 类型生成 |
+没有 API Key 时，可以打开右上角的 **演示** 开关体验界面。演示在本地运行，显示的是示例内容，不是真实翻译。
 
-模型不支持某种模式时会明确报错，用户可以切回 `prompt`。
-程序不会在失败后静默发起额外收费请求。
-单词的请求与 JSON Schema 均使用精简格式：`senses` 最先输出，每个义项最多 80 字符，
-再输出收藏去重所需的 `source_language` 和 `lemma`。所选单词由本地会话提供，模型无需重复生成。
-第一条完整释义解析完成即显示，无需等待后续元数据；旧词汇表中的详细释义仍可正常打开。
-精简通过减少请求的字段与义项数量实现，不会截断 JSON 或覆盖已配置的思考等级、输出上限。
-思考等级、温度和输出上限直接显示在模型设置中；其他选项位于「更多参数」。
+### 切换界面语言
 
-| 参数 | 配置 |
-|---|---|
-| 思考等级 | 默认、关闭、极低、低、中、高、极高、最高；发送 `none/minimal/low/medium/high/xhigh/max` |
-| 温度 | 0–2 |
-| 输出上限 | 正整数；按接口选择 `max_tokens` 或 `max_completion_tokens`，只发送一种 |
-| Top P | 0–1 |
-| 频率惩罚、存在惩罚 | -2–2 |
-| Seed | 整数；需要模型支持，不保证完全复现 |
+进入 **设置 → 外观 → 界面语言**，选择「跟随系统」「简体中文」或「English」，然后保存。英文界面对应 **Settings → Appearance → UI language → Save**。
 
-数值留空时不发送，使用供应商默认值；明确填写 `0` 会发送零值。
-思考等级「默认」不发送 `reasoning_effort`，各等级是否可用取决于模型。
-`max_completion_tokens` 包含正文与思考 token；通常只调整温度或 Top P 中的一项。
-参数约定参考 [OpenAI 官方 Chat Completions 文档](https://developers.openai.com/api/reference/resources/chat/subresources/completions/methods/create)，
-兼容供应商的实际支持范围以该模型为准。SDK 或供应商报告不兼容时显示错误，
-不在失败后静默删除参数或重试。
-「重置参数」只重置模型参数，保存后生效；「测试连接」使用已保存的完整配置。
-旧版设置文件会自动沿用默认值，不会强制添加采样参数。
-没有 `reasoning_content` 的模型只显示正文；不要求或伪造隐藏思考。
-尚未实现供应商原生 Responses、Messages 等其他协议。
-HTTP 客户端遵循 Go 的 `HTTP_PROXY` / `HTTPS_PROXY` / `NO_PROXY` 环境变量。
+默认跟随系统：中文区域使用简体中文，其他区域使用英文。界面语言与翻译目标语言分别设置。
 
-## 数据与窗口生命周期
+## 日常使用
 
-默认目录是 `%APPDATA%\SquirrelTranslate`：
+| 操作 | 方法 |
+| --- | --- |
+| 划词翻译 | 在其他应用中选中文字，点击出现的工具条中的翻译按钮 |
+| 快捷键翻译 | 选中文字后按 **Ctrl+Alt+T**；可在「设置 → 快捷键」修改 |
+| 剪贴板翻译 | 先复制文字，再从托盘菜单选择剪贴板翻译 |
+| 手动输入 | 在主窗口输入或粘贴文字，点击翻译 |
+| 保留翻译浮窗 | 点击置顶；后续选文不会覆盖已置顶窗口 |
+| 收藏单词或短语 | 等待释义完成后点击星星，在「词汇表」搜索、查看、移除或导出 JSON |
+| 暂停自动划词 | 使用托盘菜单中的暂停选项 |
+| 完全退出 | 在托盘菜单选择退出；关闭主窗口只会隐藏到托盘 |
 
-- `settings.json`：不含 API Key 的偏好配置。
-- `vocabulary.json`：带版本号的词汇表；通过临时文件、同步和原子替换写入。
-- `vocabulary-export.json`：用户主动点击导出后生成。
+翻译浮窗支持复制、停止和重新翻译。未置顶的浮窗在离开后关闭，并取消未完成的请求。自动模式识别不准确时，可切换为单词、短语或句子 / 段落模式；句子不提供词汇收藏。
 
-可用 `--data-dir <目录>` 指定独立数据目录。
-API Key 属于应用的 Windows 凭据空间，不随 `--data-dir` 分开。
-原型使用版本化 JSON 持久化词汇表；数据量和查询需求增长后可替换为 SQLite。
-窗口生命周期与词汇表独立：关闭翻译不会删除已收藏的词汇。
-普通翻译历史默认不保存；思考不写入词汇表。
+## 更新与卸载
 
-选文最多读取 12000 个 UTF-16 字符，上下文最多 2400 个。
-只有显式翻译、重新翻译或连接测试才会请求模型；自动划词阶段不会联网。
-原文是翻译主体，上下文只用于消歧，locale 是语言偏好提示。
+更新前，请先从托盘**退出**应用。当前没有应用内自动更新。
 
-## 构建和测试
-
-需要 Windows amd64/arm64 与 Go 1.27.1+。Go 1.21+ 的自动工具链功能可下载所需版本。
+- **安装程序**：从 Releases 下载新版安装程序并运行；卸载使用 Windows「设置 → 应用」。
+- **ZIP**：下载新版并解压，退出旧程序后使用新版；卸载时删除解压的程序文件夹。
+- **PowerShell**：重新运行上面的完整安装命令即可更新到最新正式版。卸载时使用下载过的脚本（临时文件已清理时，先重新执行上面的下载步骤）：
 
 ```powershell
-.\scripts\build.ps1
-go test ./...
-go vet ./...
+$installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Uninstall
 ```
 
-打包构建使用 `-H=windowsgui`，双击运行没有终端窗口。
-依赖已通过 `go.mod` / `go.sum` 固定：
+PowerShell 脚本和安装程序使用不同安装目录，请沿用原来的方式更新和卸载。卸载程序文件会保留配置、词汇表和保存的 API Key。
 
-- `github.com/egoist/mygo`：原生窗口、控件、托盘、Markdown 和系统凭据。
-- `github.com/sashabaranov/go-openai`：兼容模型请求、流式 SSE 与推理字段。
-- `github.com/go-playground/validator/v10`：配置、义项和收藏数据校验。
-- `github.com/invopop/jsonschema`：从 Go 类型生成模型响应 Schema。
-- `golang.org/x/sys/windows`、`golang.org/x/text`：Windows API、Unicode 处理。
+## 常见问题
 
-测试覆盖流式字段、完整义项的增量解码、异常输出、请求中断、上下文关闭、
-本地持久化/去重/损坏保护、显示器边界，以及取词辅助进程超时回收。
-UI 测试覆盖小窗口操作可见性、下拉菜单的键盘选择与滚动、状态控件键盘绑定。
-可设置 `SQUIRREL_UI_PREVIEW_DIR` 后运行 `go test ./cmd/squirrel -count=1`，生成离线界面预览。
+**选中文字没有反应？** 部分应用不提供可读取的选文接口；图片、扫描 PDF、自绘控件、远程桌面及高权限窗口可能无法取词。可改用复制后主动翻译剪贴板，或手动输入。目前不支持 OCR。
 
-## 取词兼容性与原型边界
+**快捷键无效？** 检查是否与其他软件冲突，在「设置 → 快捷键」更换组合。
 
-取词使用 UI Automation TextPattern；没有扫描整个文档，也不会自动发送 Ctrl+C。
-COM 在独立进程的 MTA 线程中运行，1500ms 超时；Windows Job Object 确保辅助进程
-不会在主程序结束后遗留。输入监听只提取选择手势，不记录键入内容。
+**模型连接失败？** 检查保存后的地址、模型 ID、API Key 与网络。只支持 Chat Completions 兼容接口；如果服务商不支持结构化输出模式，可将其改回 `prompt`。其他模型参数可留空使用服务商默认值。
 
-支持程度取决于目标应用是否提供选文接口。密码控件会被跳过；高权限应用、
-图片、扫描 PDF、自绘控件及远程桌面中的选文不保证可读。失败时可主动使用剪贴板或手动输入。
-取词准确度与上下文可用性需要逐应用验证。部分控件只给出整个编辑区坐标，此时使用鼠标位置作锚点。
+**可以用 WinGet 安装吗？** 尚未上架。当前请使用 Release 页面或 PowerShell 安装。
 
-自动模式使用本地启发式区分单词、短语和句子，不增加独立模型请求：
-排除明显句子标点和部分常见主谓结构后，将 2–8 个词、最多 120 字符的片段视为短语；
-中日无空格文本按长度作初判（1–4 字符为单词、5–16 字符为短语）。
-这些规则无法准确解析所有语言的语法，短句、长词和短语仍可能有歧义；
-可在首页或浮窗底部切换类别重新翻译。历史词条没有类别时按文本推断，备注和旧版丰富释义保持可读。
-LLM 内容是生成释义，并非经过词典数据库核验的完整辞条。
+## 数据与隐私
 
-本次桌面实测验证了：原型渲染、释义展示、收藏、置顶保留、独立进程取词、
-不抢焦点的工具条，以及工具条到流式浮窗的切换。
-浏览器兼容性实测被自动化工具的 URL 识别保护中止，**未标为通过**。
-尚未完成真实 API Key 联调、Office/PDF/终端矩阵和混合 DPI 的实机覆盖。
-未提供 OCR、安装器、签名和自动更新。
+配置和词汇表保存在 `%APPDATA%\SquirrelTranslate`，API Key 保存于 Windows Credential Manager。备份词汇可使用词汇表的 JSON 导出功能。
 
-## 项目跟踪
+翻译时，选文和启用的上下文会发送给你配置的模型服务商。自动划词阶段不发送模型请求；普通翻译历史默认不保存。详见 [隐私说明](PRIVACY.md)。模型生成的释义可能有误。
 
-Nuto staging / Goood (`simooowann`) / 项目 `squirrel_translatre`。
-原型任务：`SIM-540`；前期评估：`SIM-539`。
+## 开源
+
+采用 [MIT 许可证](LICENSE)，第三方依赖保留各自许可证。反馈问题请前往 [GitHub Issues](https://github.com/simiooo/squirrel_translate/issues)。
+
+开发与贡献请阅读 [开发说明](docs/DEVELOPMENT.md) 和 [分发指南](docs/DISTRIBUTION.md)。正式发布包由 GitHub Actions 构建。

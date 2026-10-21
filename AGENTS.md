@@ -14,3 +14,7 @@ session resources. Pinned translations retain their own immutable selection.
 Release packages must be built by GitHub Actions. Push a version tag to run
 the Windows release workflow and create a draft GitHub Release; do not upload
 locally built binaries as official release assets.
+
+Keep README.md and README.en.md focused on users, with equivalent Chinese
+and English installation and usage instructions. Cover both GitHub Releases
+and PowerShell 5.1 installation; keep implementation details in docs/.
