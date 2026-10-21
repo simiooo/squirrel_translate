@@ -13,8 +13,6 @@ An open-source Windows selection translator. Translate selected text, use a keyb
 
 Windows x64 and ARM64 are supported. Choose either installation method below.
 
-> v0.1.0 is currently a draft Release. Release downloads and the PowerShell commands below become available once a maintainer publishes it.
-
 ### Option 1: Install from GitHub Releases
 
 1. Open [Releases](https://github.com/simiooo/squirrel_translate/releases) and select the latest stable version.

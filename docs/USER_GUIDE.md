@@ -13,8 +13,6 @@
 
 支持 Windows x64 与 ARM64。以下任选一种安装方式。
 
-> v0.1.0 当前为 Release 草稿。维护者公开发布后，Release 下载及下面的 PowerShell 安装命令才可用。
-
 ### 方式一：从 Release 页面安装
 
 1. 打开 [Releases 页面](https://github.com/simiooo/squirrel_translate/releases)，选择最新正式版本。
