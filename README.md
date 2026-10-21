@@ -6,9 +6,11 @@ Windows 划词翻译工具，支持中英文界面、翻译浮窗和单词收藏
 
 ## 安装
 
-**[前往 Releases 下载](https://github.com/simiooo/squirrel_translate/releases)** → 选择 `-setup.exe` 安装包。普通电脑选 **amd64**，Windows ARM 电脑选 **arm64**；也可下载 ZIP 解压使用。
+### 方式一：下载安装
 
-或在 **PowerShell 5.1+** 中运行一条命令，自动下载安装：
+[前往 Releases 下载](https://github.com/simiooo/squirrel_translate/releases)
+
+### 方式二：通过 PowerShell 安装
 
 ```powershell
 irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex

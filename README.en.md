@@ -6,9 +6,11 @@ A Windows selection translator with Chinese and English UI, floating translation
 
 ## Install
 
-**[Download from Releases](https://github.com/simiooo/squirrel_translate/releases)** → Run the `-setup.exe` installer. Choose **amd64** for Intel / AMD PCs or **arm64** for Windows ARM PCs. A portable ZIP is also available.
+### Option 1: Download
 
-Or run one command in **PowerShell 5.1+** to download and install automatically:
+[Download from Releases](https://github.com/simiooo/squirrel_translate/releases)
+
+### Option 2: Install via PowerShell
 
 ```powershell
 irm https://github.com/simiooo/squirrel_translate/releases/latest/download/install.ps1 | iex
