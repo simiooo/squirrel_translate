@@ -118,3 +118,11 @@ When translating, selected text and any enabled context are sent to your configu
 ## Open source
 
 Licensed under [MIT](../LICENSE). Third-party dependencies retain their own licenses. Report problems through [GitHub Issues](https://github.com/simiooo/squirrel_translate/issues).
+
+## Pronunciation and reading aloud
+
+Word translations show a phonetic transcription when the model can provide one. Saving a word preserves it in the vocabulary list and detail view. Click the speaker next to a word to read it aloud, and click again to stop. Starting another reading, retranslating, or closing its floating window also stops playback.
+
+Reading uses Windows voices installed on your computer, with no additional speech API or internet connection. If a voice is missing, add speech for that language in Windows Settings. Transcriptions come from your translation model; system voices may use a different accent.
+
+Existing entries are not queried automatically. Click **Add pronunciation** in the vocabulary detail view, then save the completed result to update the entry. This uses your configured translation model.

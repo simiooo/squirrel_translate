@@ -20,18 +20,27 @@ func TestVocabularySurvivesRestartAndDeduplicatesLemma(t *testing.T) {
 		t.Fatalf("first save: %v %v", added, e)
 	}
 	s2, _ := New(dir)
+	stored, err := s2.List()
+	if err != nil || len(stored) != 1 {
+		t.Fatalf("reload before pronunciation update: %v %v", stored, err)
+	}
+	if stored[0].Definition.Pronunciation != "" {
+		t.Fatal("legacy entry should load without pronunciation")
+	}
 	entry := sample()
 	entry.Definition.Word = "bank"
+	entry.Definition.Pronunciation = "/bæŋk/"
 	entry.Note = ""
 	entry.Definition.Senses[0].Meaning = "银行；河岸"
 	if added, e := s2.Save(entry); e != nil || added {
 		t.Fatalf("upsert: %v %v", added, e)
 	}
-	entries, e := s2.List()
+	s3, _ := New(dir)
+	entries, e := s3.List()
 	if e != nil || len(entries) != 1 {
 		t.Fatalf("reload: %v %v", entries, e)
 	}
-	if entries[0].Note != "财务" || entries[0].Definition.Senses[0].Meaning != "银行；河岸" {
+	if entries[0].Note != "财务" || entries[0].Definition.Senses[0].Meaning != "银行；河岸" || entries[0].Definition.Pronunciation != "/bæŋk/" {
 		t.Fatal("update lost fields")
 	}
 	if e = s2.Remove(entries[0].ID); e != nil {

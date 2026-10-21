@@ -74,6 +74,7 @@ func (a *application) newTranslation(sel core.Selection, mode, target string, st
 			return
 		}
 		s.closed = true
+		a.stopSpeech(s)
 		s.cancel()
 		delete(a.sessions, s.id)
 		s.text = ""
@@ -108,7 +109,7 @@ func (s *translation) closeOnFocusChange(foreground uintptr) {
 	s.window.Close()
 }
 
-func (a *application) openStored(entry core.Entry) {
+func (a *application) openStored(entry core.Entry) *translation {
 	x, y := native.Cursor()
 	s := a.newTranslation(core.Selection{Text: entry.Word, Context: entry.Context, Locale: native.Locale(), Source: entry.Source, Bounds: core.Rect{X: x, Y: y}}, core.ModeLabel(entry.LexicalKind()), entry.TargetLanguage, false)
 	s.mode = entry.LexicalKind()
@@ -119,10 +120,14 @@ func (a *application) openStored(entry core.Entry) {
 	s.body.FollowEnd = false
 	s.demo = strings.HasPrefix(entry.Source, "本地演示")
 	s.window.Invalidate()
+	return s
 }
 func (s *translation) run() {
 	if s.closed {
 		return
+	}
+	if s.app != nil {
+		s.app.stopSpeech(s)
 	}
 	s.cancel()
 	s.generation++
@@ -350,7 +355,12 @@ func (s *translation) result(c *ui.Context) {
 	d := s.dictionary
 	ui.Column(c).Gap(space.SectionGap).Children(func() {
 		ui.Column(c).Gap(space.MetadataGap).Children(func() {
-			ui.Text(c, d.Word).FontSize(metric("Type/Word")).Bold().Selectable()
+			ui.Row(c).Gap(space.MetadataGap).AlignItems(ui.Center).Children(func() {
+				ui.Text(c, d.Word).FontSize(metric("Type/Word")).Bold().Selectable().Shrink(1).MinWidth(0)
+				if s.app != nil {
+					s.app.speechButton(c, s, d.Word, d.SourceLanguage, s.window, func(message string) { s.notice = message }, metric("Type/Word"))
+				}
+			})
 			if d.Pronunciation != "" {
 				ui.Text(c, d.Pronunciation).TextColor(t.TextMuted).Selectable()
 			}

@@ -42,12 +42,12 @@ func TestDictionaryStreamsCompletedSenseBeforeWholeDocument(t *testing.T) {
 	case <-time.After(time.Second):
 		t.Fatal("sense was not emitted before document completed")
 	}
-	_, _ = io.WriteString(w, `],"source_language":"en","lemma":"bank"}`)
+	_, _ = io.WriteString(w, `],"source_language":"en","lemma":"bank","pronunciation":"/bæŋks/"}`)
 	_ = w.Close()
 	if e = <-result; e != nil {
 		t.Fatal(e)
 	}
-	if final.Word != "banks" || final.Lemma != "bank" || final.SourceLanguage != "en" {
+	if final.Word != "banks" || final.Lemma != "bank" || final.SourceLanguage != "en" || final.Pronunciation != "/bæŋks/" {
 		t.Fatalf("compact result lost vocabulary metadata: %+v", final)
 	}
 }
@@ -74,7 +74,7 @@ func TestCompactWordContractReachesEveryResponseFormat(t *testing.T) {
 					t.Error(err)
 				}
 				w.Header().Set("Content-Type", "text/event-stream")
-				sse(w, map[string]string{"content": `{"senses":[{"part_of_speech":"n.","meaning":"银行","in_context":true}],"source_language":"en","lemma":"bank"}`}, "")
+				sse(w, map[string]string{"content": `{"senses":[{"part_of_speech":"n.","meaning":"银行","in_context":true}],"source_language":"en","lemma":"bank","pronunciation":"/bæŋks/"}`}, "")
 				sse(w, map[string]string{}, "stop")
 				fmt.Fprint(w, "data: [DONE]\n\n")
 			}))
@@ -101,8 +101,8 @@ func TestCompactWordContractReachesEveryResponseFormat(t *testing.T) {
 			if err := core.Validate.Struct(final); err != nil || final.Lemma != "bank" || final.SourceLanguage != "en" {
 				t.Fatalf("compact result cannot be collected: %+v, %v", final, err)
 			}
-			if final.Pronunciation != "" || len(final.Forms) != 0 || len(final.Collocations) != 0 || len(final.Senses[0].Examples) != 0 {
-				t.Fatal("unrequested metadata was added to compact result")
+			if final.Pronunciation != "/bæŋks/" || len(final.Forms) != 0 || len(final.Collocations) != 0 || len(final.Senses[0].Examples) != 0 {
+				t.Fatal("pronunciation was lost or unrequested metadata was added")
 			}
 			if mode != "json_schema" {
 				return
@@ -112,7 +112,7 @@ func TestCompactWordContractReachesEveryResponseFormat(t *testing.T) {
 			defs := schema["$defs"].(map[string]any)
 			root := defs[strings.TrimPrefix(schema["$ref"].(string), "#/$defs/")].(map[string]any)
 			props := root["properties"].(map[string]any)
-			if len(props) != 3 || props["senses"] == nil || props["lemma"] == nil || props["source_language"] == nil {
+			if len(props) != 4 || props["pronunciation"] == nil || props["senses"] == nil || props["lemma"] == nil || props["source_language"] == nil {
 				t.Fatalf("schema still requests a verbose dictionary: %v", props)
 			}
 			senses := props["senses"].(map[string]any)
@@ -241,7 +241,7 @@ func TestWordAnswerStartsBeforeJSONCanYieldASense(t *testing.T) {
 		case <-time.After(time.Second):
 			t.Error("answer_start waited for a complete dictionary sense")
 		}
-		sse(w, map[string]string{"content": `{"part_of_speech":"noun","meaning":"银行","in_context":true}],"source_language":"en","lemma":"bank"}`}, "")
+		sse(w, map[string]string{"content": `{"part_of_speech":"noun","meaning":"银行","in_context":true}],"source_language":"en","lemma":"bank","pronunciation":"/bæŋks/"}`}, "")
 		sse(w, map[string]string{}, "stop")
 		fmt.Fprint(w, "data: [DONE]\n\n")
 	}))

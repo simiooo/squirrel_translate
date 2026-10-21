@@ -103,6 +103,7 @@ func main() {
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
 		a.quitting = true
+		a.stopSpeech(nil)
 		if a.updates.cancel != nil {
 			a.updates.cancel()
 		}
@@ -165,6 +166,7 @@ func main() {
 var appSecrets = mygo.Secrets.Service("Squirrel Translate")
 
 type application struct {
+	speech                                      speechUI
 	window                                      *mygo.Window
 	tray                                        *mygo.Tray
 	store                                       *store.Store

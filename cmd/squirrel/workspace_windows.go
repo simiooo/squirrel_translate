@@ -212,6 +212,7 @@ func (a *application) startWorkspace() {
 		return
 	}
 	if a.workspace != nil {
+		a.stopSpeech(a.workspace)
 		a.workspace.closed = true
 		a.workspace.cancel()
 	}
@@ -353,12 +354,16 @@ func (a *application) vocabulary(c *ui.Context) {
 						b.Children(func() {
 							ui.Column(c).Grow(1).MinWidth(0).Gap(metric("Space/4")).Children(func() {
 								ui.Text(c, e.Word).FontSize(16).TextColor(color).SingleLine()
+								if e.Definition.Pronunciation != "" {
+									ui.Text(c, e.Definition.Pronunciation).FontSize(12).TextColor(secondary).SingleLine()
+								}
 								if len(e.Definition.Senses) > 0 {
 									ui.Text(c, e.Definition.Senses[0].Meaning).FontSize(12).FontWeight(400).TextColor(secondary).SingleLine()
 								}
 							})
 						})
 						if b.Clicked() {
+							a.stopSpeech(a.selectedEntry)
 							a.selectedEntry = e.ID
 							a.vocabDetail = true
 						}
@@ -382,7 +387,13 @@ func (a *application) vocabulary(c *ui.Context) {
 					}
 					e := *selected
 					ui.Scroll(c).Grow(1).MinHeight(0).Gap(metric("Space/16")).Children(func() {
-						ui.Text(c, e.Word).FontSize(28).Bold().Selectable()
+						ui.Row(c).Gap(metric("Space/8")).AlignItems(ui.Center).Children(func() {
+							ui.Text(c, e.Word).FontSize(28).Bold().Selectable().Shrink(1).MinWidth(0)
+							a.speechButton(c, e.ID, e.Word, e.SourceLanguage, a.window, func(message string) { a.status = message }, 28)
+						})
+						if e.Definition.Pronunciation != "" {
+							ui.Text(c, e.Definition.Pronunciation).TextColor(colorToken(c, "Secondary")).Selectable()
+						}
 						ui.Text(c, tr(core.ModeLabel(e.LexicalKind()))+" · "+e.SourceLanguage+" → "+e.TargetLanguage).FontSize(12).TextColor(colorToken(c, "Secondary"))
 						for _, sense := range e.Definition.Senses {
 							ui.Column(c).Gap(metric("Space/4")).Children(func() {
@@ -406,8 +417,12 @@ func (a *application) vocabulary(c *ui.Context) {
 						if textButton(c, tr("浮窗查看")).Clicked() {
 							a.openStored(e)
 						}
+						if e.Definition.Pronunciation == "" && textButton(c, tr("补充音标")).Clicked() {
+							a.openStored(e).run()
+						}
 						ui.Spacer(c)
 						if dangerButton(c, tr("移除")).Label(tr("移除词条")).Clicked() {
+							a.stopSpeech(e.ID)
 							if err := a.store.Remove(e.ID); err != nil {
 								a.status = tr("移除失败：") + err.Error()
 							} else {
