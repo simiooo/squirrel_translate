@@ -48,7 +48,7 @@ $installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Version 0.1.0 -InstallDirectory "$env:LOCALAPPDATA\Programs\MySquirrelTranslate"
 ```
 
-仅可安装已公开发布的版本。默认自动识别架构，必要时添加 `-Architecture amd64` 或 `-Architecture arm64`。自定义安装目录后，升级和卸载必须使用相同的 `-InstallDirectory`。
+仅可安装已公开发布的版本。默认自动识别架构，必要时添加 `-Architecture amd64` 或 `-Architecture arm64`。升级时自动从安装器登记、开始菜单快捷方式和默认目录识别旧安装；多个安装并存时会列出路径，请用 `-InstallDirectory` 选定。没有登记或快捷方式的自定义目录需显式指定路径。
 
 ## 首次使用
 
@@ -82,7 +82,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Version 0.1.
 
 ## 更新与卸载
 
-更新前，请先从托盘**退出**应用。当前没有应用内自动更新。
+在**设置 → 更新**或托盘菜单中选择**检查更新**。发现新版后，点击**下载更新并重启**：应用会下载对应架构的正式版、校验 SHA-256，然后退出、替换程序并重新启动。支持安装程序、PowerShell 和 ZIP 便携版，保留原安装位置、配置、词汇表和 API Key。
+
+默认每天自动检查一次，只提示，不会自动安装；可在更新页关闭。网络或校验失败不会替换当前版本。替换或新版启动失败时会尝试恢复旧版。安装目录不可写时，请使用有写入权限的位置或沿用原安装方式手动更新。
+
+没有更新入口的旧版本，或需要手动更新时，请先从托盘**退出**应用：
 
 - **安装程序**：从 Releases 下载新版安装程序并运行；卸载使用 Windows「设置 → 应用」。
 - **ZIP**：下载新版并解压，退出旧程序后使用新版；卸载时删除解压的程序文件夹。
@@ -93,7 +97,7 @@ $installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Uninstall
 ```
 
-PowerShell 脚本和安装程序使用不同安装目录，请沿用原来的方式更新和卸载。卸载程序文件会保留配置、词汇表和保存的 API Key。
+PowerShell 脚本也可原地升级安装器版和可识别的 ZIP 便携版，保留安装方式、配置、已有快捷方式（包括自定义启动参数）及卸载入口。校验失败不改动旧版；替换失败会恢复备份，若恢复也失败，会保留备份并显示路径。运行中的程序须先从托盘退出。安装器版仍通过 Windows「设置 → 应用」卸载，ZIP 版手动删除程序文件，脚本版使用 `-Uninstall`（无法自动发现时加 `-InstallDirectory`）。卸载程序文件会保留配置、词汇表和保存的 API Key。
 
 ## 常见问题
 

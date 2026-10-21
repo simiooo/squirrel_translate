@@ -29,6 +29,14 @@ func (a *application) view(c *ui.Context) {
 				case 2:
 					a.settings(c)
 				}
+				if r := a.updates.release; r != nil && !(a.tab == 2 && a.settingsTab == 4) {
+					ui.Row(c).Padding(6, uiSpacing.Main.InsetX).Gap(metric("Space/8")).AlignItems(ui.Center).Children(func() {
+						ui.Text(c, fmt.Sprintf(tr("发现新版本 %s"), r.Version())).FontSize(12)
+						if textButton(c, tr("查看更新")).Clicked() {
+							a.showUpdates()
+						}
+					})
+				}
 				if a.status != "" {
 					ui.Text(c, a.status).Label(tr("应用状态")).FontSize(12).TextColor(statusColor(c, a.status)).
 						Padding(8, uiSpacing.Main.InsetX).MaxHeight(64).Selectable()
@@ -218,7 +226,7 @@ func (a *application) settings(c *ui.Context) {
 	ui.Column(c).Grow(1).MinHeight(0).Padding(metric("Space/12"), s.InsetX, metric("Space/16")).Gap(metric("Space/12")).Children(func() {
 		pageHeading(c, tr("设置"), nil)
 		ui.Row(c).Gap(metric("Space/8")).Children(func() {
-			for i, label := range []string{tr("模型"), tr("翻译"), tr("快捷键"), tr("外观")} {
+			for i, label := range []string{tr("模型"), tr("翻译"), tr("快捷键"), tr("外观"), tr("更新")} {
 				b := textButton(c, label).Label(tr("设置：") + label)
 				if i == a.settingsTab {
 					b.TextColor(colorToken(c, "SelectedText")).Background(colorToken(c, "Selected")).Bold()
@@ -232,6 +240,8 @@ func (a *application) settings(c *ui.Context) {
 		ui.Scroll(c).Grow(1).MinHeight(0).Children(func() {
 			ui.Column(c).MaxWidth(metric("Layout/SettingsMaxWidth")).Gap(s.RowGap).Children(func() {
 				switch a.settingsTab {
+				case 4:
+					a.updateSettings(c)
 				case 0:
 					sectionTitle(c, tr("连接"))
 					formRow(c, tr("接口"), func() { field(c, &a.draft.Endpoint, "https://api.example.com/v1").Label(tr("API 地址")).Grow(1) })
@@ -280,7 +290,7 @@ func (a *application) settings(c *ui.Context) {
 		})
 		rule(c)
 		ui.Row(c).Gap(metric("Space/8")).Children(func() {
-			if primaryButton(c, tr("保存")).Label(tr("保存设置")).Clicked() {
+			if a.settingsTab != 4 && primaryButton(c, tr("保存")).Label(tr("保存设置")).Clicked() {
 				a.saveSettings()
 			}
 			if a.settingsTab == 0 && textButton(c, tr("测试连接")).Tooltip(tr("使用已保存配置发送测试请求")).Disabled(a.busy).Clicked() {

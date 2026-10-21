@@ -36,6 +36,7 @@ jobs:
           $version = if ($env:EVENT_NAME -eq 'workflow_dispatch') { $env:INPUT_VERSION } else { $env:RELEASE_TAG -replace '^v', '' }
           ./scripts/release.ps1 -Version $version -Architecture '${{ matrix.arch }}'
           ./scripts/test-install.ps1 -Version $version -Architecture '${{ matrix.arch }}'
+          ./scripts/test-install-discovery.ps1 -Version $version -Architecture '${{ matrix.arch }}'
       - uses: actions/upload-artifact@v4
         with:
           name: windows-${{ matrix.arch }}

@@ -22,6 +22,7 @@ func (a *application) setupTray() {
 		{Label: tr("翻译剪贴板"), Click: func(*mygo.MenuItem, *mygo.Window) { a.fromClipboard() }},
 		{Label: tr("词汇表"), Click: func(*mygo.MenuItem, *mygo.Window) { a.tab = 1; a.window.Show() }},
 		{Label: tr("模型设置"), Click: func(*mygo.MenuItem, *mygo.Window) { a.tab = 2; a.window.Show() }},
+		{Label: tr("检查更新"), Click: func(*mygo.MenuItem, *mygo.Window) { a.checkUpdates(true) }},
 		{Label: tr("暂停 / 恢复自动划词"), Click: func(*mygo.MenuItem, *mygo.Window) { a.paused = !a.paused; a.window.Invalidate(); a.closeToolbar() }},
 		mygo.Separator(), {Label: tr("退出"), Click: func(*mygo.MenuItem, *mygo.Window) { a.quitting = true; mygo.App.Quit() }},
 	})
@@ -190,10 +191,16 @@ func (a *application) monitor() {
 					if a.toolbar != nil && !native.Contains(a.toolbar.NativeHandle(), e.X, e.Y) {
 						a.closeToolbar()
 					}
+					if e.Kind == "down" {
+						for _, s := range a.sessions {
+							if !s.closed && !s.pinned && !native.Contains(s.window.NativeHandle(), e.X, e.Y) && !native.Related(native.Foreground(), s.window.NativeHandle()) {
+								s.window.Close()
+							}
+						}
+					}
 				})
 			}
 		case now := <-ticker.C:
-			fg := native.Foreground()
 			checkCapture := !pending.IsZero() && now.After(pending)
 			if checkCapture {
 				pending = time.Time{}
@@ -202,6 +209,9 @@ func (a *application) monitor() {
 				if a.quitting {
 					return
 				}
+				// Read on the UI thread, not before queuing this callback: a click
+				// may have activated a window in the meantime.
+				fg := native.Foreground()
 				if a.toolbar != nil {
 					h := a.toolbar.NativeHandle()
 					if fg != a.toolSelection.Owner && !native.Related(fg, h) {
@@ -215,8 +225,8 @@ func (a *application) monitor() {
 						continue
 					}
 					h := s.window.NativeHandle()
-					if !s.pinned && !native.Related(fg, h) && now.Sub(s.opened) > 450*time.Millisecond {
-						s.window.Close()
+					s.closeOnFocusChange(fg)
+					if s.closed {
 						continue
 					}
 					native.Clamp(h)

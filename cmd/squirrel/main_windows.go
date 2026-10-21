@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -17,9 +18,24 @@ import (
 	"github.com/simiooo/squirrel_translate/internal/i18n"
 	"github.com/simiooo/squirrel_translate/internal/native"
 	"github.com/simiooo/squirrel_translate/internal/store"
+	"github.com/simiooo/squirrel_translate/internal/update"
+	"golang.org/x/sys/windows"
 )
 
 func main() {
+	if len(os.Args) == 3 && os.Args[1] == "--apply-update" {
+		if err := update.RunHelper(os.Args[2]); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			var recovery *update.RecoveryError
+			if errors.As(err, &recovery) {
+				message, _ := windows.UTF16PtrFromString("更新失败，请保留以下目录以恢复文件。\nUpdate failed. Keep this folder for recovery.\n\n" + recovery.Work + "\n\n" + recovery.Reason)
+				caption, _ := windows.UTF16PtrFromString("松鼠翻译 / Squirrel Translate")
+				_, _ = windows.MessageBox(0, message, caption, windows.MB_OK|windows.MB_ICONERROR)
+			}
+			os.Exit(1)
+		}
+		return
+	}
 	if len(os.Args) > 1 && os.Args[1] == "--capture-helper" {
 		os.Exit(native.CaptureHelper())
 	}
@@ -28,6 +44,7 @@ func main() {
 	data := flag.String("data-dir", "", tr("独立数据目录，便于测试"))
 	spacingFile := flag.String("spacing-file", "", tr("加载 JSON 间距主题，便于界面调试"))
 	uiLanguage := flag.String("lang", "", "UI language override: system, zh-CN or en")
+	cleanup := flag.String("update-cleanup", "", "Internal update cleanup directory")
 	flag.Parse()
 	if *uiLanguage != "" && *uiLanguage != "system" && *uiLanguage != "zh-CN" && *uiLanguage != "en" {
 		log.Fatal("Invalid --lang; use system, zh-CN or en")
@@ -86,6 +103,9 @@ func main() {
 	mygo.App.OnWindowAllClosed(func() {})
 	mygo.App.OnBeforeQuit(func(e *mygo.QuitEvent) {
 		a.quitting = true
+		if a.updates.cancel != nil {
+			a.updates.cancel()
+		}
 		select {
 		case <-a.stop:
 		default:
@@ -129,6 +149,7 @@ func main() {
 		a.keyDraft = string(a.key)
 		a.setupTray()
 		a.registerShortcut("")
+		a.initUpdates(*cleanup)
 		go a.monitor()
 	})
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
@@ -169,4 +190,5 @@ type application struct {
 	toolbar                                     *mygo.Window
 	toolSelection                               core.Selection
 	stop                                        chan struct{}
+	updates                                     updateUI
 }

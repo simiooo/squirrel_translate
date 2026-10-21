@@ -48,7 +48,7 @@ $installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Version 0.1.0 -InstallDirectory "$env:LOCALAPPDATA\Programs\MySquirrelTranslate"
 ```
 
-Only publicly released versions can be installed. Architecture detection is automatic; override it with `-Architecture amd64` or `-Architecture arm64` if needed. If you choose a custom directory, pass the same `-InstallDirectory` when upgrading or uninstalling.
+Only publicly released versions can be installed. Architecture detection is automatic; override it with `-Architecture amd64` or `-Architecture arm64` if needed. Updates discover existing installations from installer registration, the Start menu shortcut, and the default directory. If multiple installations exist, the script lists their paths; select one with `-InstallDirectory`. Custom locations without registration or a shortcut require an explicit path.
 
 ## First launch
 
@@ -82,7 +82,11 @@ Translation windows support copy, stop, and retranslate. Unpinned windows close 
 
 ## Update and uninstall
 
-**Quit from the tray** before updating. There is no in-app automatic updater yet.
+Choose **Check for updates** under **Settings → Updates** or in the tray menu. When a newer version is available, click **Download update and restart**. The app downloads the stable release for your architecture, verifies SHA-256, quits, replaces its files and restarts. Installer, PowerShell and portable ZIP installations keep their location, settings, vocabulary and API key.
+
+Automatic checks run daily and only notify; they never install without your action. You can disable them on the Updates page. Network or verification failures leave the current version intact. Replacement or startup failures trigger an attempt to restore the previous version. If the installation directory is not writable, use a writable location or update manually using your original installation method.
+
+For older versions without the update entry, or when updating manually, **quit from the tray** first:
 
 - **Installer:** Download and run the newer installer from Releases. Uninstall through Windows Settings → Apps.
 - **ZIP:** Download and extract the newer version, then quit the old app before using it. Delete the extracted program folder to uninstall.
@@ -93,7 +97,7 @@ $installer = Join-Path $env:TEMP 'squirrel_translate-install.ps1'
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File $installer -Uninstall
 ```
 
-The script and setup installer use different directories. Continue using your original installation method for updates and removal. Removing the program preserves settings, vocabulary, and the saved API key.
+The PowerShell script can also upgrade installer and recognized portable ZIP installations in place. It preserves the installation type, settings, existing shortcuts (including custom arguments), and uninstaller. Verification failures leave the old version intact. Replacement failures restore backups; if recovery fails too, backups are retained and their path is shown. Quit the running app from the tray first. Uninstall installer editions through Windows Settings, remove ZIP application files manually, and use `-Uninstall` for script installations (add `-InstallDirectory` if discovery cannot find them). Removing the program preserves settings, vocabulary, and the saved API key.
 
 ## Troubleshooting
 

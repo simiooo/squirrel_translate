@@ -31,7 +31,8 @@ type translation struct {
 	embedded                                   bool
 	availableWidth                             float32
 	copiedUntil                                time.Time
-	opened                                     time.Time
+	focusOrigin                                uintptr
+	activated                                  bool
 	generation                                 uint64
 	cancel                                     context.CancelFunc
 	body                                       ui.ListState
@@ -52,7 +53,7 @@ func (a *application) newTranslation(sel core.Selection, mode, target string, st
 		}
 	}
 	a.next++
-	s := &translation{app: a, id: a.next, selection: sel, modeChoice: mode, targetChoice: target, includeContext: a.cfg.IncludeContext, demo: a.demo, opened: time.Now(), cancel: func() {}}
+	s := &translation{app: a, id: a.next, selection: sel, modeChoice: mode, targetChoice: target, includeContext: a.cfg.IncludeContext, demo: a.demo, focusOrigin: native.Foreground(), cancel: func() {}}
 	s.body.FollowEnd = true
 	s.md.ShareSelection = true
 	s.md.Reveal = &markdown.Reveal{Unit: markdown.AtOnce, Fade: -1}
@@ -67,6 +68,7 @@ func (a *application) newTranslation(sel core.Selection, mode, target string, st
 	_ = s.window.SetIcon(appIconPNG)
 	native.RoundCorners(s.window.NativeHandle())
 	a.sessions[s.id] = s
+	s.window.OnFocus(func() { s.activated = true })
 	s.window.OnClosed(func() {
 		if s.closed {
 			return
@@ -81,11 +83,29 @@ func (a *application) newTranslation(sel core.Selection, mode, target string, st
 		s.selection = core.Selection{}
 	})
 	native.Place(s.window.NativeHandle(), sel.Bounds, min(520, maxW), min(height, maxH))
-	s.window.Show()
+	// Keep the source active while reading; ordinary clicks may still activate
+	// this window, so do not apply the toolbar's WS_EX_NOACTIVATE style.
+	s.window.ShowInactive()
 	if start {
 		s.run()
 	}
 	return s
+}
+
+func (s *translation) closeOnFocusChange(foreground uintptr) {
+	if s.closed || s.pinned {
+		return
+	}
+	if native.Related(foreground, s.window.NativeHandle()) {
+		s.activated = true
+		return
+	}
+	// Before the first activation, the original foreground window is expected
+	// to keep focus. Afterwards, returning to it is a real focus loss.
+	if !s.activated && foreground != 0 && foreground == s.focusOrigin {
+		return
+	}
+	s.window.Close()
 }
 
 func (a *application) openStored(entry core.Entry) {

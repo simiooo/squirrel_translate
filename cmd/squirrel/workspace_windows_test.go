@@ -75,6 +75,13 @@ func TestVocabularyListDetailAndNarrowBack(t *testing.T) {
 // A separate process owns hidden native windows, without a tray, global
 // shortcuts, user files, credentials or network requests.
 func TestMain(m *testing.M) {
+	if os.Getenv("SQUIRREL_FOCUS_PROBE") == "1" {
+		if err := nativeTranslationFocusProbe(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+		os.Exit(0)
+	}
 	if os.Getenv("SQUIRREL_WINDOW_PROBE") == "1" {
 		if err := nativeWorkspaceProbe(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
