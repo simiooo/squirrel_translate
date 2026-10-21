@@ -11,7 +11,7 @@ An open-source Windows selection translator. Translate selected text, use a keyb
 
 ## Install
 
-Windows x64 and ARM64 are supported. Release packages do not require Go. Choose either installation method below.
+Windows x64 and ARM64 are supported. Choose either installation method below.
 
 > v0.1.0 is currently a draft Release. Release downloads and the PowerShell commands below become available once a maintainer publishes it.
 
@@ -116,5 +116,3 @@ When translating, selected text and any enabled context are sent to your configu
 ## Open source
 
 Licensed under [MIT](../LICENSE). Third-party dependencies retain their own licenses. Report problems through [GitHub Issues](https://github.com/simiooo/squirrel_translate/issues).
-
-For development and contributions, see the [development notes](DEVELOPMENT.md) and [distribution guide](DISTRIBUTION.md) (Chinese). Official release packages are built by GitHub Actions.

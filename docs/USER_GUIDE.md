@@ -11,7 +11,7 @@
 
 ## 安装
 
-支持 Windows x64 与 ARM64，使用发布包无需安装 Go。以下任选一种安装方式。
+支持 Windows x64 与 ARM64。以下任选一种安装方式。
 
 > v0.1.0 当前为 Release 草稿。维护者公开发布后，Release 下载及下面的 PowerShell 安装命令才可用。
 
@@ -116,5 +116,3 @@ PowerShell 脚本和安装程序使用不同安装目录，请沿用原来的方
 ## 开源
 
 采用 [MIT 许可证](../LICENSE)，第三方依赖保留各自许可证。反馈问题请前往 [GitHub Issues](https://github.com/simiooo/squirrel_translate/issues)。
-
-开发与贡献请阅读 [开发说明](DEVELOPMENT.md) 和 [分发指南](DISTRIBUTION.md)。正式发布包由 GitHub Actions 构建。

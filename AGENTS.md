@@ -22,3 +22,6 @@ and PowerShell 5.1 installation; keep implementation details in docs/.
 Keep both READMEs short: prioritize installation and first use. Provide a
 one-command PowerShell installer; put updates, uninstall, troubleshooting,
 and other details in the linked user guides.
+
+Do not explain the implementation stack or build prerequisites in user-facing
+installation instructions. Focus on where to download and how to install.
