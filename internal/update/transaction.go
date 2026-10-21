@@ -73,18 +73,40 @@ func readPlan(work string) (*Plan, error) {
 	return &p, nil
 }
 
-func samePath(a, b string) bool { return strings.EqualFold(filepath.Clean(a), filepath.Clean(b)) }
+func samePath(a, b string) bool {
+	// Windows may report an existing path using either its long or 8.3 name.
+	if resolved, err := filepath.EvalSymlinks(a); err == nil {
+		a = resolved
+	}
+	if resolved, err := filepath.EvalSymlinks(b); err == nil {
+		b = resolved
+	}
+	return strings.EqualFold(filepath.Clean(a), filepath.Clean(b))
+}
+
+func rejectSymlinks(path string) error {
+	for {
+		info, err := os.Lstat(path)
+		if err != nil {
+			return err
+		}
+		if info.Mode()&os.ModeSymlink != 0 {
+			return errors.New("symbolic links are not supported for updates")
+		}
+		parent := filepath.Dir(path)
+		if parent == path {
+			return nil
+		}
+		path = parent
+	}
+}
 func (p *Plan) validate() error {
 	if !filepath.IsAbs(p.Work) || !filepath.IsAbs(p.Target) || !samePath(filepath.Dir(p.Work), filepath.Dir(p.Target)) || !strings.HasPrefix(filepath.Base(p.Work), ".squirrel-update-") || !strings.EqualFold(filepath.Ext(p.Target), ".exe") {
 		return errors.New("invalid update paths")
 	}
 	for _, path := range []string{p.Target, p.Work} {
-		resolved, err := filepath.EvalSymlinks(path)
-		if err != nil {
+		if err := rejectSymlinks(path); err != nil {
 			return err
-		}
-		if !samePath(path, resolved) {
-			return errors.New("symbolic links are not supported for updates")
 		}
 	}
 	if _, err := versionParts(p.Version); err != nil {

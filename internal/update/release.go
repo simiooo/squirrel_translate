@@ -226,12 +226,13 @@ func (c *Client) Prepare(ctx context.Context, r Release, target, arch string, ar
 	if err != nil {
 		return nil, err
 	}
-	resolved, e := filepath.EvalSymlinks(target)
-	if e != nil {
-		return nil, e
+	if err = rejectSymlinks(target); err != nil {
+		return nil, err
 	}
-	if !strings.EqualFold(resolved, target) {
-		return nil, errors.New("cannot update through a symbolic link")
+	// Expand DOS short names without confusing them with symbolic links.
+	target, err = filepath.EvalSymlinks(target)
+	if err != nil {
+		return nil, err
 	}
 	work, e := os.MkdirTemp(filepath.Dir(target), ".squirrel-update-")
 	if e != nil {

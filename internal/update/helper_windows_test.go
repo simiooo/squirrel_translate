@@ -19,6 +19,49 @@ import (
 	"golang.org/x/sys/windows/registry"
 )
 
+func TestShortPathInstallation(t *testing.T) {
+	target := makeTarget(t, "squirrel_translate.exe")
+	name, err := windows.UTF16PtrFromString(target)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var buf [32768]uint16
+	n, err := windows.GetShortPathName(name, &buf[0], uint32(len(buf)))
+	if err != nil || n == 0 || n >= uint32(len(buf)) {
+		t.Fatalf("short path: %d %v", n, err)
+	}
+	short := windows.UTF16ToString(buf[:n])
+	if strings.EqualFold(short, target) {
+		t.Skip("8.3 names are disabled on this volume")
+	}
+	if !samePath(short, target) {
+		t.Fatal("short and long names must identify the same installation")
+	}
+	c, r, _ := fixture(t)
+	p, err := c.Prepare(context.Background(), r, short, runtime.GOARCH, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := p.validate(); err != nil {
+		t.Fatal(err)
+	}
+	if !samePath(p.Target, target) {
+		t.Fatal("preparation changed the installation target")
+	}
+}
+
+func TestRejectLinkedInstallation(t *testing.T) {
+	target := makeTarget(t, "squirrel_translate.exe")
+	link := filepath.Join(t.TempDir(), "linked.exe")
+	if err := os.Symlink(target, link); err != nil {
+		t.Skipf("symlink creation unavailable: %v", err)
+	}
+	c, r, _ := fixture(t)
+	if _, err := c.Prepare(context.Background(), r, link, runtime.GOARCH, nil, nil); err == nil {
+		t.Fatal("accepted a symbolic link installation")
+	}
+}
+
 func TestMain(m *testing.M) {
 	// These routes exist only in the test executable; production cannot select
 	// a registry key or update endpoint using environment variables.
