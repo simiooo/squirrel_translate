@@ -18,3 +18,7 @@ locally built binaries as official release assets.
 Keep README.md and README.en.md focused on users, with equivalent Chinese
 and English installation and usage instructions. Cover both GitHub Releases
 and PowerShell 5.1 installation; keep implementation details in docs/.
+
+Keep both READMEs short: prioritize installation and first use. Provide a
+one-command PowerShell installer; put updates, uninstall, troubleshooting,
+and other details in the linked user guides.
