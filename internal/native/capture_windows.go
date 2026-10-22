@@ -89,7 +89,7 @@ func Capture(ctx context.Context) (core.Selection, error) {
 	if e = json.Unmarshal(b, &s); e != nil {
 		return s, e
 	}
-	if strings.TrimSpace(s.Text) == "" {
+	if !core.HasText(s.Text) {
 		return s, ErrNoSelection()
 	}
 	return s, nil

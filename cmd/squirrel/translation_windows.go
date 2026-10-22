@@ -41,6 +41,11 @@ type translation struct {
 }
 
 func (a *application) openTranslation(sel core.Selection, mode, target string) *translation {
+	// Every selection entry point funnels through here. Never create the
+	// floating window when the captured range contains no readable text.
+	if !core.HasText(sel.Text) {
+		return nil
+	}
 	return a.newTranslation(sel, mode, target, true)
 }
 func (a *application) newTranslation(sel core.Selection, mode, target string, start bool) *translation {
@@ -328,7 +333,7 @@ func (s *translation) result(c *ui.Context) {
 					}
 				}
 				word := strings.TrimSpace(strings.Join(text, " "))
-				if word != "" {
+				if core.HasText(word) {
 					s.lookupWord(word)
 				}
 			}
@@ -403,6 +408,9 @@ func (s *translation) result(c *ui.Context) {
 	})
 }
 func (s *translation) lookupWord(word string) {
+	if !core.HasText(word) {
+		return
+	}
 	sel := core.Selection{Text: limitText(word, 160), Context: limitText(s.text, 2400), Locale: s.selection.Locale, Source: tr("译文选词"), Bounds: s.selection.Bounds}
 	s.app.openTranslation(sel, core.ModeLabel(core.ResolveMode(word, "单词 / 短语")), s.targetChoice)
 }

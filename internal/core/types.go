@@ -96,6 +96,20 @@ type Selection struct {
 	Bounds  Rect    `json:"bounds"`
 }
 
+// HasText reports whether a selection contains readable content. Providers
+// can return whitespace, zero-width spaces, a BOM or an object replacement
+// character for an empty range or a non-text object. None of those should
+// open the selection toolbar or a translation window.
+func HasText(s string) bool {
+	for _, r := range s {
+		if unicode.IsSpace(r) || unicode.IsControl(r) || unicode.Is(unicode.Cf, r) || r == '\uFFFC' {
+			continue
+		}
+		return true
+	}
+	return false
+}
+
 func Classify(s string) string {
 	s = strings.Trim(strings.TrimSpace(s), "\"'“”‘’()[]")
 	if s == "" {

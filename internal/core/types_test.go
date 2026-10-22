@@ -74,3 +74,15 @@ func TestPlacementNeverLeavesNegativeOriginMonitor(t *testing.T) {
 		}
 	}
 }
+func TestSelectionNeedsVisibleText(t *testing.T) {
+	for _, text := range []string{"", " ", "\t\n", "\u00a0", "\u200b", "\ufeff", "\u2060", "\u00ad", "\ufffc", "\x00"} {
+		if HasText(text) {
+			t.Errorf("%q should count as empty", text)
+		}
+	}
+	for _, text := range []string{"bank", " 你好 ", "take care", "😀", "a\u200bb"} {
+		if !HasText(text) {
+			t.Errorf("%q should count as text", text)
+		}
+	}
+}

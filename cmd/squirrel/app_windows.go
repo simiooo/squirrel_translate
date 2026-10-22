@@ -51,7 +51,7 @@ func (a *application) registerShortcut(old string) {
 }
 func (a *application) fromClipboard() {
 	text := strings.TrimSpace(mygo.Clipboard.ReadText())
-	if text == "" {
+	if !core.HasText(text) {
 		a.status = tr("剪贴板中没有文本")
 		a.window.Show()
 		return
@@ -111,6 +111,12 @@ func (a *application) closeToolbar() {
 	}
 }
 func (a *application) showToolbar(sel core.Selection) {
+	// A selection gesture can still resolve to blank text (whitespace, a
+	// zero-width range or a selected object). Do not open a popup for it.
+	if !core.HasText(sel.Text) {
+		a.closeToolbar()
+		return
+	}
 	a.closeToolbar()
 	a.toolSelection = sel
 	width, height := toolbarSize()
