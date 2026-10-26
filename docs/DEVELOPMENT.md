@@ -156,7 +156,12 @@ UI 测试覆盖小窗口操作可见性、下拉菜单的键盘选择与滚动�
 
 ## 取词兼容性与原型边界
 
-取词使用 UI Automation TextPattern；没有扫描整个文档，也不会自动发送 Ctrl+C。
+取词使用 UI Automation TextPattern；没有读取整个文档，也不会自动发送 Ctrl+C。
+首先沿焦点和鼠标命中元素的 Raw View 父链查找，最多 32 层，到前台窗口根节点停止。
+未找到可读选区时，仅在该窗口的 Document 后代节点中补查 TextPattern，最多检查 64 个文档节点，
+跳过屏幕外及密码文档。此路径用于兼容选区位于嵌套文档、焦点仍在外层查看器的情况（如 Chrome PDF）。
+对象占位符及空选区不会中止后续查找；始终只接受 GetSelection 返回的可读文字。
+查询方式参考 [Microsoft UI Automation 元素查找文档](https://learn.microsoft.com/en-us/windows/win32/winauto/uiauto-obtainingelements)。
 COM 在独立进程的 MTA 线程中运行，1500ms 超时；Windows Job Object 确保辅助进程
 不会在主程序结束后遗留。输入监听只提取选择手势，不记录键入内容。
 
@@ -174,5 +179,7 @@ LLM 内容是生成释义，并非经过词典数据库核验的完整辞条。
 本次桌面实测验证了：原型渲染、释义展示、收藏、置顶保留、独立进程取词、
 不抢焦点的工具条，以及工具条到流式浮窗的切换。
 浏览器兼容性实测被自动化工具的 URL 识别保护中止，**未标为通过**。
+嵌套 PDF 文档选区、深层父节点、空选区、密码与屏幕外节点过滤、前台窗口查找边界和 COM 引用释放已有模拟提供程序回归测试；
+这些测试不替代 Chrome PDF 的实机验证。
 尚未完成真实 API Key 联调、Office/PDF/终端矩阵和混合 DPI 的实机覆盖。
 已提供安装器与 ZIP 分发，以及应用内检查、校验和重启更新，详见 [更新机制](UPDATES.md)。尚未提供 OCR 和代码签名。

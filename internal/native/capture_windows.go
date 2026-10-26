@@ -7,7 +7,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/simiooo/squirrel_translate/internal/i18n"
 	"os"
 	"os/exec"
 	"runtime"
@@ -17,6 +16,7 @@ import (
 	"unsafe"
 
 	"github.com/simiooo/squirrel_translate/internal/core"
+	"github.com/simiooo/squirrel_translate/internal/i18n"
 	"golang.org/x/sys/windows"
 )
 
@@ -35,6 +35,10 @@ var arrayUpper = oleaut.NewProc("SafeArrayGetUBound")
 
 type comObject struct{ vtable *[96]uintptr }
 
+// COM writes through pointer arguments. Keep their Go allocations stable and
+// alive across the wrapper, including providers that call back into Go.
+//
+//go:uintptrescapes
 func call(obj *comObject, index int, args ...uintptr) error {
 	if obj == nil {
 		return fmt.Errorf("%s", i18n.T("空 COM 对象"))
@@ -144,48 +148,53 @@ func CaptureHelper() int {
 	defer release(automation)
 	owner := Foreground()
 	x, y := Cursor()
-	var focused, pointed, walker *comObject
+	var root, focused, pointed, walker *comObject
+	if call(automation, 6, owner, uintptr(unsafe.Pointer(&root))) != nil || root == nil {
+		return 1
+	}
+	defer release(root)
 	_ = call(automation, 8, uintptr(unsafe.Pointer(&focused)))
 	defer release(focused)
 	packed := uintptr(uint64(uint32(x)) | uint64(uint32(y))<<32)
 	_ = call(automation, 7, packed, uintptr(unsafe.Pointer(&pointed)))
 	defer release(pointed)
-	_ = call(automation, 14, uintptr(unsafe.Pointer(&walker)))
+	// Raw view includes embedded document containers omitted from control view.
+	_ = call(automation, 16, uintptr(unsafe.Pointer(&walker)))
 	defer release(walker)
+	s, ok := captureSelection(automation, root, focused, pointed, walker, x, y)
+	if !ok || Foreground() != owner {
+		return 1
+	}
+	s.Owner = owner
+	s.Source = ProcessName(owner)
+	s.Locale = Locale()
+	if json.NewEncoder(os.Stdout).Encode(s) != nil {
+		return 1
+	}
+	return 0
+}
+
+func captureSelection(automation, root, focused, pointed, walker *comObject, x, y int) (core.Selection, bool) {
 	for _, start := range []*comObject{focused, pointed} {
 		element := start
-		for depth := 0; depth < 9 && element != nil; depth++ {
+		for depth := 0; depth < 32 && element != nil; depth++ {
 			var password int32
-			_ = call(element, 35, uintptr(unsafe.Pointer(&password)))
-			if password != 0 {
+			if err := call(element, 35, uintptr(unsafe.Pointer(&password))); err != nil || password != 0 {
 				if element != start {
 					release(element)
 				}
-				return 1
+				return core.Selection{}, false
 			}
-			var pattern *comObject
-			_ = call(element, 16, 10014, uintptr(unsafe.Pointer(&pattern)))
-			if pattern != nil {
-				s, ok := selectionOf(pattern, x, y)
-				release(pattern)
-				if ok {
-					if element != start {
-						release(element)
-					}
-					if Foreground() != owner {
-						return 1
-					}
-					s.Owner = owner
-					s.Source = ProcessName(owner)
-					s.Locale = Locale()
-					if json.NewEncoder(os.Stdout).Encode(s) != nil {
-						return 1
-					}
-					return 0
+			if s, ok := elementSelection(element, x, y); ok {
+				if element != start {
+					release(element)
 				}
+				return s, true
 			}
+			var same int32
+			compareErr := call(automation, 3, uintptr(unsafe.Pointer(element)), uintptr(unsafe.Pointer(root)), uintptr(unsafe.Pointer(&same)))
 			var parent *comObject
-			if walker != nil {
+			if compareErr == nil && same == 0 && walker != nil {
 				_ = call(walker, 3, uintptr(unsafe.Pointer(element)), uintptr(unsafe.Pointer(&parent)))
 			}
 			if element != start {
@@ -197,7 +206,64 @@ func CaptureHelper() int {
 			release(element)
 		}
 	}
-	return 1
+	return documentSelection(automation, root, x, y)
+}
+
+func elementSelection(element *comObject, x, y int) (core.Selection, bool) {
+	var pattern *comObject
+	_ = call(element, 16, 10014, uintptr(unsafe.Pointer(&pattern))) // UIA_TextPatternId
+	if pattern == nil {
+		return core.Selection{}, false
+	}
+	defer release(pattern)
+	return selectionOf(pattern, x, y)
+}
+
+// VARIANT is passed indirectly on the supported Windows amd64/arm64 ABIs.
+type automationVariant struct {
+	Type     uint16
+	Reserved [3]uint16
+	Value    [2]uintptr
+}
+
+func documentSelection(automation, root *comObject, x, y int) (core.Selection, bool) {
+	// Chromium PDF can leave focus/hit testing on the viewer shell while the
+	// selection belongs to a descendant Document. Search only this window's
+	// document providers, never the desktop or their full document text.
+	value := automationVariant{Type: 3, Value: [2]uintptr{50030}} // VT_I4, UIA_DocumentControlTypeId
+	var condition *comObject
+	if call(automation, 23, 30003, uintptr(unsafe.Pointer(&value)), uintptr(unsafe.Pointer(&condition))) != nil || condition == nil {
+		return core.Selection{}, false
+	}
+	defer release(condition)
+	var documents *comObject
+	if call(root, 6, 4, uintptr(unsafe.Pointer(condition)), uintptr(unsafe.Pointer(&documents))) != nil || documents == nil { // FindAll(TreeScope_Descendants)
+		return core.Selection{}, false
+	}
+	defer release(documents)
+	var count int32
+	if call(documents, 3, uintptr(unsafe.Pointer(&count))) != nil {
+		return core.Selection{}, false
+	}
+	for i := int32(0); i < count && i < 64; i++ {
+		var element *comObject
+		if call(documents, 4, uintptr(i), uintptr(unsafe.Pointer(&element))) != nil || element == nil {
+			continue
+		}
+		var password, offscreen int32
+		passwordErr := call(element, 35, uintptr(unsafe.Pointer(&password)))
+		offscreenErr := call(element, 38, uintptr(unsafe.Pointer(&offscreen)))
+		var s core.Selection
+		var ok bool
+		if passwordErr == nil && offscreenErr == nil && password == 0 && offscreen == 0 {
+			s, ok = elementSelection(element, x, y)
+		}
+		release(element)
+		if ok {
+			return s, true
+		}
+	}
+	return core.Selection{}, false
 }
 
 func selectionOf(pattern *comObject, x, y int) (core.Selection, bool) {
@@ -219,7 +285,9 @@ func selectionOf(pattern *comObject, x, y int) (core.Selection, bool) {
 	}
 	defer release(r)
 	s := core.Selection{Text: strings.TrimSpace(textOf(r, 12000)), Bounds: core.Rect{X: x, Y: y, Width: 1, Height: 1}}
-	if s.Text == "" {
+	// An outer PDF viewer may select only an embedded-object marker. Keep
+	// looking for the nested text provider instead of stopping on that marker.
+	if !core.HasText(s.Text) {
 		return s, false
 	}
 	var bounds unsafe.Pointer
